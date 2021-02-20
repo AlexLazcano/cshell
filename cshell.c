@@ -176,6 +176,7 @@ Parsing method
 void ParseCommand(const char *command)
 {
 	
+	
 
 	char *copyOfCommand = strdup(command);
 
@@ -202,6 +203,10 @@ void ParseCommand(const char *command)
 
 		return;
 	}
+
+
+	
+
 
 	//if not variable
 	char *token;
@@ -271,24 +276,35 @@ void ParseCommand(const char *command)
 		return;
 	}
 	
+	if (strcmp(token, "./ ") == 0)
+	{
+		printf("%s", token);
+	}
+	
+
+	
 	
 	else
 	{
 		
-		char *array[10];
+		char *params[10];
 
 		int i = 0;
 		
 		while (token != NULL)
 		{
-			array[i] = strdup(token);
+			params[i] = strdup(token);
 			token = strtok(NULL, " \n");
 
 			i++;
 		}
-		array[i] = (char *)0;
+		params[i] = (char *)0;
 
-		char *cmd = array[0];
+		char *cmd = params[0];
+
+		printf("%s\n", cmd);
+		
+
 
 		if (fork() != 0)
 		{
@@ -296,6 +312,15 @@ void ParseCommand(const char *command)
 			wait(NULL);
 			//printf("Parent running again\n");
 		}
+		if (cmd[0] == '.' && cmd[1] == '/')
+		{
+			printf("Child %d: %s\n",getpid(), cmd);
+			
+			execv(params[0], params);
+			exit(0);
+		}
+		
+
 		else
 		{
 
@@ -305,7 +330,7 @@ void ParseCommand(const char *command)
 			strcat(path, cmd);
 			//printf("Path: %s \n", path);
 
-			execvp(path, array);
+			execvp(path, params);
 			exit(0);
 		}
 
