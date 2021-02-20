@@ -99,6 +99,7 @@ void InsertVar(const char *varName, const char *varValue)
 			strcpy(ptr->value, varValue);
 			break;
 		}
+		ptr = ptr->next;
 	}
 
 	EnvVar *newNode = (EnvVar *)malloc(sizeof(EnvVar));
@@ -175,8 +176,6 @@ Parsing method
 */
 void ParseCommand(const char *command)
 {
-	
-	
 
 	char *copyOfCommand = strdup(command);
 
@@ -203,10 +202,6 @@ void ParseCommand(const char *command)
 
 		return;
 	}
-
-
-	
-
 
 	//if not variable
 	char *token;
@@ -243,7 +238,6 @@ void ParseCommand(const char *command)
 		}
 		return;
 	}
-	
 
 	//Print value command
 	if (strcmp("theme", token) == 0)
@@ -275,22 +269,14 @@ void ParseCommand(const char *command)
 
 		return;
 	}
-	
-	if (strcmp(token, "./ ") == 0)
-	{
-		printf("%s", token);
-	}
-	
 
-	
-	
 	else
 	{
-		
+
 		char *params[10];
 
 		int i = 0;
-		
+
 		while (token != NULL)
 		{
 			params[i] = strdup(token);
@@ -302,24 +288,35 @@ void ParseCommand(const char *command)
 
 		char *cmd = params[0];
 
-		printf("%s\n", cmd);
 		
-
-
 		if (fork() != 0)
 		{
-			
+
 			wait(NULL);
 			//printf("Parent running again\n");
 		}
-		if (cmd[0] == '.' && cmd[1] == '/')
+		else if (cmd[0] == '.' && cmd[1] == '/')
 		{
-			printf("Child %d: %s\n",getpid(), cmd);
 			
-			execv(params[0], params);
+
+			printf("%s\n", cmd);
+
+			char * line[100];
+			FILE *file;
+			int c;
+			file = fopen("bye.txt", "r");
+			while ((c = fgetc(file) )!= EOF)
+			{
+				printf("%c", c);
+			}
+			printf("\n");
+
+			fclose(file);
+
+
+			//execv(params[0], params);
 			exit(0);
 		}
-		
 
 		else
 		{
@@ -333,12 +330,7 @@ void ParseCommand(const char *command)
 			execvp(path, params);
 			exit(0);
 		}
-
-		
-		
 	}
-	
-	
 }
 
 ///
@@ -359,14 +351,12 @@ int main(int argc, char const *argv[])
 			printf("cshell$ ");
 			continue;
 		}
-		
+
 		command[strcspn(command, "\n")] = 0;
 		InsertCommand(command);
 
-		
 		//execute latest command
 		ParseCommand(tailCommand->string);
-		
 
 		printf("cshell$ ");
 	}
