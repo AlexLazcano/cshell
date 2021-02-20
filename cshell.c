@@ -26,6 +26,8 @@ struct Node *tailCommand = NULL;
 struct EnvVar *headVar = NULL;
 struct EnvVar *tailVar = NULL;
 
+char *COLOR = "\033[0m";
+const char *ResetCOLOR = "\033[0m";
 //Command functions
 
 void InsertCommand(char *instruction)
@@ -227,19 +229,35 @@ void ParseCommand(const char *command)
 	//Print value command
 	if (strcmp("print", token) == 0)
 	{
+
 		token = strtok(NULL, " ");
-		while (token != NULL)
+
+		if (token[0] == '$')
 		{
+			while (token != NULL)
+			{
 
-			char *value = FindVar(token);
+				char *value = FindVar(token);
 
-			printf("%s = %s \n", token, value);
-			token = strtok(NULL, " ");
+				printf("%s = %s \n", token, value);
+				token = strtok(NULL, " ");
+			}
+			return;
 		}
-		return;
+		else
+		{
+			while (token != NULL)
+			{
+
+				printf("%s ", token);
+				token = strtok(NULL, " ");
+			}
+			printf("\n");
+			return;
+		}
 	}
 
-	//Print value command
+	//Change theme command
 	if (strcmp("theme", token) == 0)
 	{
 		token = strtok(NULL, " ");
@@ -251,20 +269,24 @@ void ParseCommand(const char *command)
 
 		if (strcmp(token, "reset") == 0)
 		{
-			printf("\033[0m\033[0m");
+			COLOR = "\033[0m";
+			printf("\033[0m");
 		}
 
 		if (strcmp(token, "red") == 0)
 		{
-			printf("\033[31m");
+			COLOR = "\033[31m";
+			//printf("\033[31m");
 		}
 		if (strcmp(token, "green") == 0)
 		{
-			printf("\033[32m");
+			COLOR = "\033[32m";
+			//printf("\033[32m");
 		}
 		if (strcmp(token, "blue") == 0)
 		{
-			printf("\033[36m");
+			COLOR = "\033[36m";
+			//printf("\033[36m");
 		}
 
 		return;
@@ -288,34 +310,51 @@ void ParseCommand(const char *command)
 
 		char *cmd = params[0];
 
-		
+		if (cmd[0] == '.' && cmd[1] == '/')
+		{
+
+			//need to add a pipe to connect the color
+
+			char line[100];
+			FILE *file;
+			int c;
+			int i = 0;
+
+			char PATH[100] = "";
+			strcat(PATH, &cmd[2]);
+
+			strcat(PATH, ".txt");
+
+			file = fopen(PATH, "r");
+
+			if (file)
+			{
+				while ((fgets(line, 100, file)) != NULL)
+				{
+					if (strcmp(line, "\n") == 0)
+					{
+						continue;
+					}
+					++i;
+
+					printf("line %d: %s", i, line);
+					InsertCommand(line);
+					ParseCommand(tailCommand->string);
+				}
+
+				printf("\n");
+
+				fclose(file);
+			}
+
+			return;
+		}
+
 		if (fork() != 0)
 		{
 
 			wait(NULL);
 			//printf("Parent running again\n");
-		}
-		else if (cmd[0] == '.' && cmd[1] == '/')
-		{
-			
-
-			printf("%s\n", cmd);
-
-			char * line[100];
-			FILE *file;
-			int c;
-			file = fopen("bye.txt", "r");
-			while ((c = fgetc(file) )!= EOF)
-			{
-				printf("%c", c);
-			}
-			printf("\n");
-
-			fclose(file);
-
-
-			//execv(params[0], params);
-			exit(0);
 		}
 
 		else
@@ -342,13 +381,13 @@ int main(int argc, char const *argv[])
 {
 	char command[50];
 
-	printf("cshell$ ");
+	printf("%scshell$ %s", COLOR, ResetCOLOR);
 
 	while (fgets(command, 100, stdin))
 	{
 		if (strcmp(command, "\n") == 0)
 		{
-			printf("cshell$ ");
+			printf("%scshell$ %s", COLOR, ResetCOLOR);
 			continue;
 		}
 
@@ -358,7 +397,7 @@ int main(int argc, char const *argv[])
 		//execute latest command
 		ParseCommand(tailCommand->string);
 
-		printf("cshell$ ");
+		printf("%scshell$ %s", COLOR, ResetCOLOR);
 	}
 
 	printf("Cleaing..");

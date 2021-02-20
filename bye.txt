@@ -1,1 +1,12 @@
-hello world
+theme blue
+
+print hello world
+
+log
+
+
+$var1=420
+
+$var2=43
+
+print $var2 $var1
