@@ -62,8 +62,10 @@ void InsertCommand(char *instruction)
 void FreeCommandList()
 {
 	printf("Deleting Commands...\n");
+
 	Node *ptr = headCommand;
 	Node *tmp;
+
 	while (ptr)
 	{
 		tmp = ptr->next;
@@ -99,6 +101,7 @@ void InsertVar(const char *varName, const char *varValue)
 			strcpy(ptr->value, varValue);
 			break;
 		}
+		ptr =ptr->next;
 	}
 
 	EnvVar *newNode = (EnvVar *)malloc(sizeof(EnvVar));
@@ -173,17 +176,17 @@ void FreeLists()
 Parsing method
 
 */
-void ParseCommand(const char *command)
+void ParseCommand( char *command)
 {
-	
-	
 
 	char *copyOfCommand = strdup(command);
+	printf("%s", copyOfCommand);
 
 	// read first character to see if its a variable
 	if (copyOfCommand[0] == '$')
 	{
 
+		
 		char *token;
 
 		token = strtok(copyOfCommand, " =\n");
@@ -200,16 +203,13 @@ void ParseCommand(const char *command)
 
 		InsertVar(varName, varValue);
 		char *value = FindVar(varName);
-
+		
 		return;
 	}
-
-
 	
 
-
-	//if not variable
 	char *token;
+	free(copyOfCommand);
 
 	token = strtok(copyOfCommand, " \n");
 
@@ -218,11 +218,12 @@ void ParseCommand(const char *command)
 	{
 		printf("Exiting...\n");
 		FreeLists();
+		
 		exit(0);
 	}
 
 	//log command
-	if (strcmp("log", token) == 0)
+	else if (strcmp("log", token) == 0)
 	{
 		printf("Log:\n");
 		printList();
@@ -230,23 +231,23 @@ void ParseCommand(const char *command)
 	}
 
 	//Print value command
-	if (strcmp("print", token) == 0)
+	else if (strcmp("print", token) == 0)
 	{
 		token = strtok(NULL, " ");
 		while (token != NULL)
 		{
-
+			
 			char *value = FindVar(token);
+
 
 			printf("%s = %s \n", token, value);
 			token = strtok(NULL, " ");
 		}
 		return;
 	}
-	
 
 	//Print value command
-	if (strcmp("theme", token) == 0)
+	else if (strcmp("theme", token) == 0)
 	{
 		token = strtok(NULL, " ");
 		//printf("Print variable: %s\n", token);
@@ -275,22 +276,14 @@ void ParseCommand(const char *command)
 
 		return;
 	}
-	
-	if (strcmp(token, "./ ") == 0)
-	{
-		printf("%s", token);
-	}
-	
 
-	
-	
 	else
 	{
-		
+
 		char *params[10];
 
 		int i = 0;
-		
+
 		while (token != NULL)
 		{
 			params[i] = strdup(token);
@@ -302,25 +295,44 @@ void ParseCommand(const char *command)
 
 		char *cmd = params[0];
 
-		printf("%s\n", cmd);
-		
+		printf("%s", cmd);
+		//script mode
+		if (cmd[0] == '.' && cmd[1] == '/')
+		{
+			printList();
+			// printf("Child %d: %s\n", getpid(), cmd);
+			printf("%s\n", cmd);
+			// execv(params[0], params);
+			int c;
+			char line[500];
+			FILE *file;
+			file = fopen("text.txt", "r");
+			if (file)
+			{
+				printf("Read file succesfully\n");
+				while ((c = fgetc(file)) != EOF)
+				{
+					// printf("%c", c);
+				}
+				printf("\n");
+				
+				fclose(file);
+			}
+			else
+			{
 
+				printf("No file found");
+			}
+
+			return;
+		}
 
 		if (fork() != 0)
 		{
-			
+
 			wait(NULL);
 			//printf("Parent running again\n");
 		}
-		if (cmd[0] == '.' && cmd[1] == '/')
-		{
-			printf("Child %d: %s\n",getpid(), cmd);
-			
-			execv(params[0], params);
-			exit(0);
-		}
-		
-
 		else
 		{
 
@@ -333,12 +345,7 @@ void ParseCommand(const char *command)
 			execvp(path, params);
 			exit(0);
 		}
-
-		
-		
 	}
-	
-	
 }
 
 ///
@@ -352,6 +359,7 @@ int main(int argc, char const *argv[])
 
 	printf("cshell$ ");
 
+	
 	while (fgets(command, 100, stdin))
 	{
 		if (strcmp(command, "\n") == 0)
@@ -359,19 +367,20 @@ int main(int argc, char const *argv[])
 			printf("cshell$ ");
 			continue;
 		}
-		
-		command[strcspn(command, "\n")] = 0;
-		InsertCommand(command);
 
+		command[strcspn(command, "\n")] = 0;
 		
+		InsertCommand(command);
+		
+
 		//execute latest command
 		ParseCommand(tailCommand->string);
-		
 
 		printf("cshell$ ");
+		memset(command, 0, 50);
 	}
 
-	printf("Cleaing..");
+	printf("Cleaning..");
 	FreeLists();
 	return 0;
 }
