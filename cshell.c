@@ -16,6 +16,7 @@ typedef struct Node
 {
 	char *string;
 	char *timeString;
+	int code;
 
 	struct Node *next;
 } Node;
@@ -79,12 +80,16 @@ void FreeCommandList()
 void printList()
 {
 	Node *ptr = headCommand;
+	printf("\033[32m");
 	while (ptr)
 	{
+		
 		printf("%s", ptr->timeString);
-		printf(" %s\n", ptr->string);
+		printf(" %s %d \n", ptr->string, ptr->code);
+		
 		ptr = ptr->next;
 	}
+	printf("%s", ResetCOLOR);
 }
 
 // variable Functions
@@ -195,13 +200,14 @@ void ParseCommand(const char *command)
 		if (token == NULL)
 		{
 			printf("Error, no variable value\n");
+			tailCommand->code =-1;
 			return;
 		}
 		char *varValue = strdup(token);
 
 		InsertVar(varName, varValue);
 		char *value = FindVar(varName);
-
+		tailCommand->code = 0;
 		return;
 	}
 
@@ -220,6 +226,7 @@ void ParseCommand(const char *command)
 		if (status == -1)
 		{
 			printf("Path not found\n");
+			tailCommand->code = -1;
 		}
 		
 		
@@ -240,6 +247,7 @@ void ParseCommand(const char *command)
 	{
 		printf("Log:\n");
 		printList();
+		tailCommand->code = 0;
 		return;
 	}
 
@@ -259,6 +267,7 @@ void ParseCommand(const char *command)
 				printf("%s = %s \n", token, value);
 				token = strtok(NULL, " ");
 			}
+			tailCommand->code = 0;
 			return;
 		}
 		else
@@ -270,6 +279,7 @@ void ParseCommand(const char *command)
 				token = strtok(NULL, " ");
 			}
 			printf("\n");
+			tailCommand->code = 0;
 			return;
 		}
 	}
@@ -282,30 +292,31 @@ void ParseCommand(const char *command)
 		if (token == NULL)
 		{
 			printf("Error, No color selected");
+			tailCommand->code = -1;
 		}
 
-		if (strcmp(token, "reset") == 0)
+		else if (strcmp(token, "reset") == 0)
 		{
 			COLOR = "\033[0m";
 			printf("\033[0m");
 		}
 
-		if (strcmp(token, "red") == 0)
+		else if (strcmp(token, "red") == 0)
 		{
 			COLOR = "\033[31m";
 			//printf("\033[31m");
 		}
-		if (strcmp(token, "green") == 0)
+		else if (strcmp(token, "green") == 0)
 		{
 			COLOR = "\033[32m";
 			//printf("\033[32m");
 		}
-		if (strcmp(token, "blue") == 0)
+		else if (strcmp(token, "blue") == 0)
 		{
 			COLOR = "\033[36m";
 			//printf("\033[36m");
 		}
-
+		tailCommand->code = 0;
 		return;
 	}
 
@@ -363,7 +374,7 @@ void ParseCommand(const char *command)
 
 				fclose(file);
 			}
-
+			
 			return;
 		}
 
