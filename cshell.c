@@ -210,6 +210,23 @@ void ParseCommand(const char *command)
 
 	token = strtok(copyOfCommand, " \n");
 
+	if (strcmp("cd", token) == 0)
+	{
+
+		token = strtok(NULL, " ");
+
+		int status = chdir(token);
+
+		if (status == -1)
+		{
+			printf("Path not found\n");
+		}
+		
+		
+		return;
+	}
+	
+
 	//exit command
 	if (strcmp("exit", token) == 0)
 	{
