@@ -5,4 +5,4 @@ hello: process.c
 	gcc -o hello process.c
 
 clean:
-	-rm cshell.o
+	-rm cshell
