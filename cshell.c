@@ -402,11 +402,12 @@ void ParseCommand(const char *command)
 			//printf("Path: %s \n", path);
 
 			int status = execvp(path, params);
-			if (status == -1)
+
+			if (status != 0)
 			{
-				tailCommand->code -1;
+				tailCommand->code = -1;
 			}
-			return;
+			
 			
 		}
 		tailCommand->code = -1;
