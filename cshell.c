@@ -83,15 +83,14 @@ void printList()
 	printf("\033[32m");
 	while (ptr)
 	{
-		
+
 		printf("%s", ptr->timeString);
 		printf(" %s %d \n", ptr->string, ptr->code);
 		if (ptr->code != 0)
 		{
-			printf("Failure\n");
+			printf("Failure, error in arguments\n");
 		}
-		
-		
+
 		ptr = ptr->next;
 	}
 	printf("%s", ResetCOLOR);
@@ -205,7 +204,7 @@ void ParseCommand(const char *command)
 		if (token == NULL)
 		{
 			printf("Error, no variable value\n");
-			tailCommand->code =-1;
+			tailCommand->code = -1;
 			return;
 		}
 		char *varValue = strdup(token);
@@ -233,11 +232,9 @@ void ParseCommand(const char *command)
 			printf("Path not found\n");
 			tailCommand->code = -1;
 		}
-		
-		
+
 		return;
 	}
-	
 
 	//exit command
 	if (strcmp("exit", token) == 0)
@@ -369,9 +366,9 @@ void ParseCommand(const char *command)
 						continue;
 					}
 					++i;
-					
+
 					printf("line %d: %s\n", i, line);
-					
+
 					InsertCommand(line);
 					ParseCommand(tailCommand->string);
 				}
@@ -380,8 +377,7 @@ void ParseCommand(const char *command)
 
 				fclose(file);
 			}
-			
-			
+
 			return;
 		}
 
@@ -408,8 +404,6 @@ void ParseCommand(const char *command)
 				tailCommand->code = -1;
 			}
 			exit(0);
-			
-			
 		}
 		tailCommand->code = -1;
 	}
