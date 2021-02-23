@@ -64,7 +64,7 @@ void InsertCommand(char *instruction)
 
 void FreeCommandList()
 {
-	printf("Deleting Commands...\n");
+	//printf("Deleting Commands...\n");
 	Node *ptr = headCommand;
 	Node *tmp;
 	while (ptr)
@@ -86,6 +86,11 @@ void printList()
 		
 		printf("%s", ptr->timeString);
 		printf(" %s %d \n", ptr->string, ptr->code);
+		if (ptr->code != 0)
+		{
+			printf("Failure\n");
+		}
+		
 		
 		ptr = ptr->next;
 	}
@@ -130,7 +135,7 @@ void InsertVar(const char *varName, const char *varValue)
 
 void FreeVarList()
 {
-	printf("Deleting Variables...\n");
+	//printf("Deleting Variables...\n");
 	EnvVar *ptr = headVar;
 	EnvVar *tmp;
 	while (ptr)
@@ -237,7 +242,7 @@ void ParseCommand(const char *command)
 	//exit command
 	if (strcmp("exit", token) == 0)
 	{
-		printf("Exiting...\n");
+		//printf("Exiting...\n");
 		FreeLists();
 		exit(0);
 	}
@@ -364,8 +369,9 @@ void ParseCommand(const char *command)
 						continue;
 					}
 					++i;
-
-					printf("line %d: %s", i, line);
+					
+					printf("line %d: %s\n", i, line);
+					
 					InsertCommand(line);
 					ParseCommand(tailCommand->string);
 				}
@@ -374,6 +380,7 @@ void ParseCommand(const char *command)
 
 				fclose(file);
 			}
+			
 			
 			return;
 		}
@@ -397,6 +404,7 @@ void ParseCommand(const char *command)
 			execvp(path, params);
 			exit(0);
 		}
+		tailCommand->code = -1;
 	}
 }
 
