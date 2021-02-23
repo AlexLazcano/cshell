@@ -401,8 +401,13 @@ void ParseCommand(const char *command)
 			strcat(path, cmd);
 			//printf("Path: %s \n", path);
 
-			execvp(path, params);
-			exit(0);
+			int status = execvp(path, params);
+			if (status == -1)
+			{
+				tailCommand->code -1;
+			}
+			return;
+			
 		}
 		tailCommand->code = -1;
 	}
