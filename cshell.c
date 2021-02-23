@@ -407,6 +407,7 @@ void ParseCommand(const char *command)
 			{
 				tailCommand->code = -1;
 			}
+			exit(0);
 			
 			
 		}
