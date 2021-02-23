@@ -295,30 +295,36 @@ void ParseCommand(const char *command)
 		{
 			printf("Error, No color selected");
 			tailCommand->code = -1;
+			return;
 		}
 
 		else if (strcmp(token, "reset") == 0)
 		{
 			COLOR = "\033[0m";
 			printf("\033[0m");
+			return;
 		}
 
 		else if (strcmp(token, "red") == 0)
 		{
 			COLOR = "\033[31m";
 			//printf("\033[31m");
+			return;
 		}
 		else if (strcmp(token, "green") == 0)
 		{
 			COLOR = "\033[32m";
 			//printf("\033[32m");
+			return;
 		}
 		else if (strcmp(token, "blue") == 0)
 		{
 			COLOR = "\033[36m";
 			//printf("\033[36m");
+			return;
 		}
-		tailCommand->code = 0;
+		printf("Error, color not supported\n");
+		tailCommand->code = -1;
 		return;
 	}
 
